@@ -1,0 +1,12 @@
+{
+    "job_name": "Collect and Preprocess the Data \uD83E\uDD16",
+    "file_path": "",
+    "description": "Collect and Preprocess the Data",
+    "category": "Extraction",
+    "technology": "bash",
+    "technology_catalog": "Saagie",
+    "runtime_version": "debian11-bullseye",
+    "command_line": "echo \"Preprocessing in progress...\"",
+    "extra_technology": "",
+    "extra_technology_version": ""
+}

@@ -1,0 +1,84 @@
+pipeline_name: Demo Pipeline
+env:
+  dev:
+    graph_pipeline:
+      job_nodes:
+        - id: a0d2c9bb-2a5e-48a5-a561-f8ac5153da3b
+          job_name: Collect and Preprocess the Data 🤖
+          job_id: 465140da-f941-4a25-a4b3-114ad50e231d
+          next_nodes:
+            - ac9ca371-c007-4e94-b1ee-22b605129c71
+        - id: 25eda874-e0d5-4965-bd1e-b32521d35aa5
+          job_name: Clean the Data 👩‍💻
+          job_id: 8503eba5-0b0b-4006-937b-b459dee35f42
+          next_nodes:
+            - f3729b1b-e5bd-4482-a1a5-dda5bdcfef98
+        - id: 6c4bd80a-1e4a-444c-bdf3-3ddb58443a7b
+          job_name: Manage Error
+          job_id: f2d5c6cf-3135-45d5-9f52-04073ff062ca
+          next_nodes: []
+        - id: 53c3172e-25f4-420c-b064-a5eb2381e0ba
+          job_name: launch_GPU_training
+          job_id: 7d224a2c-4b55-48ec-9a35-da60743d4ad8
+          next_nodes: []
+        - id: 54c30e82-29df-4dc6-a6c3-75ad2b3a5fdc
+          job_name: Manage Error
+          job_id: f2d5c6cf-3135-45d5-9f52-04073ff062ca
+          next_nodes: []
+      condition_nodes:
+        - id: ac9ca371-c007-4e94-b1ee-22b605129c71
+          condition_type: status
+          value: AllSuccessOrSkipped
+          next_nodes_success:
+            - 25eda874-e0d5-4965-bd1e-b32521d35aa5
+          next_nodes_failure:
+            - 6c4bd80a-1e4a-444c-bdf3-3ddb58443a7b
+        - id: f3729b1b-e5bd-4482-a1a5-dda5bdcfef98
+          condition_type: status
+          value: AllSuccessOrSkipped
+          next_nodes_success:
+            - 53c3172e-25f4-420c-b064-a5eb2381e0ba
+          next_nodes_failure:
+            - 54c30e82-29df-4dc6-a6c3-75ad2b3a5fdc
+  prod:
+    graph_pipeline:
+      job_nodes:
+        - id: a0d2c9bb-2a5e-48a5-a561-f8ac5153da3b
+          job_name: Collect and Preprocess the Data 🤖
+          job_id: 465140da-f941-4a25-a4b3-114ad50e231d
+          next_nodes:
+            - ac9ca371-c007-4e94-b1ee-22b605129c71
+        - id: 25eda874-e0d5-4965-bd1e-b32521d35aa5
+          job_name: Clean the Data 👩‍💻
+          job_id: 8503eba5-0b0b-4006-937b-b459dee35f42
+          next_nodes:
+            - f3729b1b-e5bd-4482-a1a5-dda5bdcfef98
+        - id: 6c4bd80a-1e4a-444c-bdf3-3ddb58443a7b
+          job_name: Manage Error
+          job_id: f2d5c6cf-3135-45d5-9f52-04073ff062ca
+          next_nodes: []
+        - id: 53c3172e-25f4-420c-b064-a5eb2381e0ba
+          job_name: launch_GPU_training
+          job_id: 7d224a2c-4b55-48ec-9a35-da60743d4ad8
+          next_nodes: []
+        - id: 54c30e82-29df-4dc6-a6c3-75ad2b3a5fdc
+          job_name: Manage Error
+          job_id: f2d5c6cf-3135-45d5-9f52-04073ff062ca
+          next_nodes: []
+      condition_nodes:
+        - id: ac9ca371-c007-4e94-b1ee-22b605129c71
+          condition_type: status
+          value: AllSuccessOrSkipped
+          next_nodes_success:
+            - 25eda874-e0d5-4965-bd1e-b32521d35aa5
+          next_nodes_failure:
+            - 6c4bd80a-1e4a-444c-bdf3-3ddb58443a7b
+        - id: f3729b1b-e5bd-4482-a1a5-dda5bdcfef98
+          condition_type: status
+          value: AllSuccessOrSkipped
+          next_nodes_success:
+            - 53c3172e-25f4-420c-b064-a5eb2381e0ba
+          next_nodes_failure:
+            - 54c30e82-29df-4dc6-a6c3-75ad2b3a5fdc
+has_execution_variables_enabled:
+description: Change description

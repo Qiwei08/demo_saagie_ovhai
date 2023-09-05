@@ -1,0 +1,12 @@
+{
+    "job_name": "Clean the Data \uD83D\uDC69\u200D\uD83D\uDCBB",
+    "file_path": "",
+    "description": "",
+    "category": "Extraction",
+    "technology": "bash",
+    "technology_catalog": "Saagie",
+    "runtime_version": "debian11-bullseye",
+    "command_line": "echo \"Cleaning in progress...\"",
+    "extra_technology": "",
+    "extra_technology_version": ""
+}

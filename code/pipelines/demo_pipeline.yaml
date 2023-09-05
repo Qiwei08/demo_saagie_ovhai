@@ -1,4 +1,4 @@
-pipeline_name: Demo Pipeline
+pipeline_name: Demo Pipeline 
 env:
   dev:
     graph_pipeline:

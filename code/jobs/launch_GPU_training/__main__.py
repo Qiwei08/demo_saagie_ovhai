@@ -174,6 +174,7 @@ def main():
         raise
 
     # Get job status
+    logging.info("Getting job status ...")
     try:
         response_job = requests.get(f"https://gra.training.ai.cloud.ovh.net/v1/job/{response_create_job.json()['id']}",
                                     auth=BearerAuth(ovh_token_gra))

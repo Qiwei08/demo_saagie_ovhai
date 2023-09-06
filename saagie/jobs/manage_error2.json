@@ -1,12 +1,12 @@
 {
-    "job_name": "Manage Error",
+    "job_name": "Manage Error 2",
     "file_path": "",
-    "description": "error printing ...",
+    "description": "error printing...",
     "category": "Extraction",
     "technology": "bash",
     "technology_catalog": "Saagie",
     "runtime_version": "debian11-bullseye",
-    "command_line": "echo \"Saagie MANAGE ERROR\"'",
+    "command_line": "echo \"Saagie MANAGE ERROR 2\"'",
     "extra_technology": "",
     "extra_technology_version": ""
 }

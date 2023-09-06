@@ -4,7 +4,7 @@ name: Build and deploy on prod
 on:
   push:
     branches:
-      - 'master'        # matches only main
+      - 'master'        # matches only master
 env:
   CI_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
@@ -33,7 +33,9 @@ jobs:
             jobs:
               - saagie/jobs/*.json
             pipelines:
-              - saagie/pipelines/*.json
+              - code/pipelines/*.yaml
+            job_source:
+              - code/jobs/*/*.py
 
       - name: Run step if any of the jobs files above change
         if: steps.changed-files-specific.outputs.jobs_any_changed == 'true' # check if a job config file have change
@@ -46,6 +48,14 @@ jobs:
             python __main__.py --action package_job --job_name ${file_name_without_ext} 
             python __main__.py --action update_job --job_name ${file_name_without_ext} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
           done
+    
+      - name: Run step if any of the jobs sources files above change
+        if: steps.changed-files-specific.outputs.job_source_any_changed == 'true' # check if a job config file have change
+        # then it will package the job and update on Saagie
+        run: |
+            python __main__.py --action package_job --job_name launch_GPU_training
+            python __main__.py --action update_job --job_name launch_GPU_training --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
+
 
       - name: Run step if any of the pipelines files above change
         if: steps.changed-files-specific.outputs.pipelines_any_changed == 'true' # check if a pipeline config file have change

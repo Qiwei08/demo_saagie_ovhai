@@ -1,7 +1,7 @@
 {
     "job_name": "launch_GPU_training",
     "file_path": "dist/launch_GPU_training.zip",
-    "description": "",
+    "description": "launch training",
     "category": "Processing",
     "technology": "Python",
     "technology_catalog": "Saagie",

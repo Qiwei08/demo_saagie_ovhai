@@ -1,7 +1,7 @@
 {
     "job_name": "Clean the Data \uD83D\uDC69\u200D\uD83D\uDCBB",
     "file_path": "",
-    "description": "",
+    "description": "Clean data",
     "category": "Extraction",
     "technology": "bash",
     "technology_catalog": "Saagie",

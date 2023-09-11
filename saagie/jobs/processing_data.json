@@ -1,0 +1,12 @@
+{
+    "job_name": "Preprocessing data",
+    "file_path": "",
+    "description": "Preprocessing data",
+    "category": "Processing",
+    "technology": "bash",
+    "technology_catalog": "Saagie",
+    "runtime_version": "debian11-bullseye",
+    "command_line": "echo \"Preprocessing in progress...\"",
+    "extra_technology": "",
+    "extra_technology_version": ""
+}

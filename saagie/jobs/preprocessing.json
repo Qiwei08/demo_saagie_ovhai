@@ -1,0 +1,12 @@
+{
+    "job_name": "Preprocessing",
+    "file_path": "dist/preprocessing_data.zip",
+    "description": "",
+    "category": "Processing",
+    "technology": "Python",
+    "technology_catalog": "Saagie",
+    "runtime_version": "3.10",
+    "command_line": "python {file}",
+    "extra_technology": "",
+    "extra_technology_version": ""
+}

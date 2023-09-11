@@ -1,0 +1,12 @@
+{
+    "job_name": "Test job",
+    "file_path": "",
+    "description": "",
+    "category": "Extraction",
+    "technology": "bash",
+    "technology_catalog": "Saagie",
+    "runtime_version": "debian11-bullseye",
+    "command_line": "echo \"Testing in progress...\"",
+    "extra_technology": "",
+    "extra_technology_version": ""
+}

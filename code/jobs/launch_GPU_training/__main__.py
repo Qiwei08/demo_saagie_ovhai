@@ -205,11 +205,14 @@ def main():
     for line in response_job_logs.splitlines():
         print(line, flush=True)
 
-    if last_status == "FAILED":
-        logging.error("Job failed on OVH")
-        exit(1)
-    else:
-        logging.info("Job finished on OVH")
+import logging
+
+if last_status == "FAILED":
+    logging.error("Job failed on OVH")
+    exit(1)
+else:
+    logging.info("Job completed successfully")
+
 
 
 

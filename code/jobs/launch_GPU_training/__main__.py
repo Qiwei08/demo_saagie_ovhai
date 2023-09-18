@@ -210,11 +210,9 @@ import logging
 if last_status == "FAILED":
     logging.error("Job failed on OVH")
     exit(1)
-else:
-    logging.info("Job completed successfully")
-
-
-
+elif last_status == "SUCCEEDED":
+    logging.info("Job succeeded on OVH")
+    exit(0)
 
 
 if __name__ == "__main__":

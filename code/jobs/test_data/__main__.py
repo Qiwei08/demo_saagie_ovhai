@@ -1,4 +1,5 @@
 import random
+from faker import Faker
 
 
 # create a function to generate data

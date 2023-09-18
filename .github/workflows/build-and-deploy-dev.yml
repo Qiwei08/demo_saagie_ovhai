@@ -41,7 +41,7 @@ jobs:
 
       - name: Run changed-files with dir_names
         id: changed-files-dir-names
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v37
         with:
           dir_names: "true"
           files_yaml: |
@@ -66,7 +66,10 @@ jobs:
         run: |
           for file in ${{ steps.changed-files-specific.outputs.source_code_all_changed_files }}; do
             echo "$file was modified"
-            
+            dir_name=$(basename ${file})
+            echo "$dir_name"
+            python __main__.py --action package_job --job_name ${dir_name} 
+            python __main__.py --action update_job --job_name ${dir_name} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
             done
     
 #      - name: Run step if any of the jobs sources files above change

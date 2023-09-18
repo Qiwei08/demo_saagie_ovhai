@@ -62,8 +62,7 @@ jobs:
           
 
       - name: Run step if any of the jobs dir above change
-        if: steps.changed-files-dir-names.outputs.jobs_any_changed == 'true' # check if a job config file have change
-        # then it will package the job and update on Saagie
+        if: steps.changed-files-dir-names.outputs.source_code_any_changed == 'true'
         run: |
           for file in ${{ steps.changed-files-specific.outputs.source_code_all_changed_files }}; do
             echo "$file was modified"

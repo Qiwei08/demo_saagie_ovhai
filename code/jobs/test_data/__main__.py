@@ -1,3 +1,6 @@
+import random
+
+
 # create a function to generate data
 def generate_data():
     # create a list of 1000 random numbers

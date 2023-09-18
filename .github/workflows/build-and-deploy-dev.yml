@@ -70,7 +70,7 @@ jobs:
             echo "$dir_name"
             python __main__.py --action package_job --job_name ${dir_name} 
             python __main__.py --action update_job --job_name ${dir_name} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
-            done
+          done
     
 #      - name: Run step if any of the jobs sources files above change
 #        if: steps.changed-files-specific.outputs.job_source_any_changed == 'true' # check if a job config file have change

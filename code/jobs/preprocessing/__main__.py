@@ -4,73 +4,69 @@
 # Display a message  before starting processing and when it's finished plus the total duration of the operation
 
 import boto3
-import pandas as pd
-from bs4 import BeautifulSoup
 import re
-import datetime
 import time
+import pandas as pd
 
-def copy_dataset_to_s3():
-    # Display message before starting processing
-    print("Copying dataset to S3 bucket...")
-    
-    # Copying dataset from Huggingface to S3 bucket
-    # Replace 'input_dataset_path' with the actual path of the dataset on Huggingface
-    input_dataset_path = "huggingface_dataset_path"
-    s3_bucket_name = "your_s3_bucket_name"
-    output_dataset_key = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_extract_comment_IMDB_from_HF.csv"
-    
-    s3 = boto3.client('s3')
-    s3.upload_file(input_dataset_path, s3_bucket_name, output_dataset_key)
-    
-    # Display message after finishing processing
-    print("Dataset copied to S3 bucket successfully!")
-    
-    return output_dataset_key
+# Function to remove HTML tags from a string
+def remove_html_tags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
 
-def remove_html_tags_and_emoji(input_file_path, output_file_path):
-    # Display message before starting processing
-    print("Removing HTML tags and emojis...")
-    
-    # Read the dataset file using pandas
-    df = pd.read_csv(input_file_path)
-    
-    # Remove HTML tags using BeautifulSoup
-    df['comment'] = df['comment'].apply(lambda x: BeautifulSoup(x, "html.parser").get_text())
-    
-    # Remove emojis using regex
+# Function to remove emojis from a string
+def remove_emojis(text):
     emoji_pattern = re.compile("["
                                u"\U0001F600-\U0001F64F"  # emoticons
                                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
                                u"\U0001F680-\U0001F6FF"  # transport & map symbols
                                u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                               u"\U00002500-\U00002BEF"  # chinese char
+                               u"\U00002702-\U000027B0"
                                u"\U00002702-\U000027B0"
                                u"\U000024C2-\U0001F251"
+                               u"\U0001f926-\U0001f937"
+                               u"\U00010000-\U0010ffff"
+                               u"\u2640-\u2642"
+                               u"\u2600-\u2B55"
+                               u"\u200d"
+                               u"\u23cf"
+                               u"\u23e9"
+                               u"\u231a"
+                               u"\ufe0f"  # dingbats
+                               u"\u3030"
                                "]+", flags=re.UNICODE)
-    
-    df['comment'] = df['comment'].apply(lambda x: emoji_pattern.sub(r'', x))
-    
-    # Save the modified dataset to a new file
-    df.to_csv(output_file_path, index=False)
-    
+    return emoji_pattern.sub(r'', text)
+
+# Function to copy the dataset to S3 bucket and perform required operations
+def process_dataset():
+    # Start time
+    start_time = time.time()
+
+    # Display message before starting processing
+    print("Starting dataset processing...")
+
+    # Copy the dataset to S3 bucket
+    s3 = boto3.client('s3')
+    s3.download_file('huggingface-datasets', 'tiny-bert-dataset.csv', 'dataset.csv')
+
+    # Read the dataset into a pandas DataFrame
+    df = pd.read_csv('dataset.csv')
+
+    # Remove HTML tags and emojis from the 'comment' column
+    df['comment'] = df['comment'].apply(remove_html_tags)
+    df['comment'] = df['comment'].apply(remove_emojis)
+
+    # Rename the output file with the specified pattern
+    timestamp = time.strftime("%Y%m%d%H%M%S")
+    output_filename = f"{timestamp}_extract_comment_IMDB_from_HF.csv"
+    df.to_csv(output_filename, index=False)
+
     # Display message after finishing processing
-    print("HTML tags and emojis removed successfully!")
+    print("Dataset processing completed!")
 
-def main():
-    # Copy dataset to S3 bucket
-    output_dataset_key = copy_dataset_to_s3()
-    
-    # Remove HTML tags and emojis from the copied dataset
-    input_file_path = f"s3://{your_s3_bucket_name}/{output_dataset_key}"
-    output_file_path = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_extract_comment_IMDB_from_HF_cleaned.csv"
-    remove_html_tags_and_emoji(input_file_path, output_file_path)
-    
-    # Calculate the total duration of the operation
-    end_time = time.time()
-    duration = end_time - start_time
-    
-    # Display message with total duration of the operation
-    print(f"Processing completed in {duration} seconds.")
+    # Calculate total duration of the operation
+    duration = time.time() - start_time
+    print(f"Total duration: {duration} seconds")
 
-if __name__ == "__main__":
-    main()
+# Call the function to process the dataset
+process_dataset()

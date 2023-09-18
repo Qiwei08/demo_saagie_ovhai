@@ -16,4 +16,4 @@ def generate_names():
     # return the names
     return names
 
-print(generate_names())
+print(generate_data())

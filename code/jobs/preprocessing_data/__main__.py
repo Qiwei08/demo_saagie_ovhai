@@ -4,3 +4,4 @@
 # Display a message  before starting processing and when it's finished plus the total duration of the operation
 
 
+print("Start preprocessing data")

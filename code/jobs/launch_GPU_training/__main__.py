@@ -208,8 +208,11 @@ def main():
     if last_status == "FAILED":
         logging.error("Job failed on OVH")
         exit(1)
+    # code block for if condition is True
     else:
         logging.info("Job finished on OVH")
+
+
         
         
 

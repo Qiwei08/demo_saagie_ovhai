@@ -4,52 +4,66 @@
 # Display a message  before starting processing and when it's finished plus the total duration of the operation
 
 
+import time
 import boto3
-import datetime
 import pandas as pd
+from bs4 import BeautifulSoup
 import re
-import requests
 
+# Copy dataset from Huggingface to S3 bucket
 def copy_dataset_to_s3():
-    # Display a message before starting processing
-    print("Copying dataset to S3 bucket...")
+    # Code to copy dataset from Huggingface to S3 bucket goes here
+    pass
 
-    # Get the current timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+# Remove HTML tags from text
+def remove_html_tags(text):
+    soup = BeautifulSoup(text, "html.parser")
+    return soup.get_text()
 
-    # Download the dataset from Huggingface
-    url = "https://path/to/dataset.csv"
-    response = requests.get(url)
-    dataset = response.text
+# Remove emoji from text
+def remove_emoji(text):
+    emoji_pattern = re.compile("["
+                           u"\U0001F600-\U0001F64F"  # emoticons
+                           u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                           u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                           u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           u"\U00002702-\U000027B0"
+                           u"\U000024C2-\U0001F251"
+                           "]+", flags=re.UNICODE)
+    return emoji_pattern.sub(r'', text)
 
-    # Remove HTML tags using regular expressions
-    dataset = re.sub("<.*?>", "", dataset)
+# Rename output file with timestamp and description
+def rename_output_file(filename):
+    timestamp = time.strftime("%Y%m%d%H%M%S")
+    new_filename = f"{timestamp}_extract_comment_IMDB_from_HF.csv"
+    # Code to rename the file goes here
+    pass
 
-    # Remove emojis using regular expressions
-    dataset = re.sub("[^\u0000-\uFFFF]", "", dataset)
-
-    # Save the processed dataset to a file
-    output_filename = f"{timestamp}_extract_comment_IMDB_from_HF.csv"
-    with open(output_filename, "w") as file:
-        file.write(dataset)
-
-    # Upload the file to S3 bucket
-    s3 = boto3.client("s3")
-    s3.upload_file(output_filename, "your-s3-bucket", output_filename)
-
-    # Display a message when finished
-    print("Dataset copied to S3 bucket successfully.")
-
-if __name__ == "__main__":
-    # Start measuring the time
-    start_time = datetime.datetime.now()
-
-    # Call the function to copy the dataset to S3 bucket
+# Main function
+def main():
+    # Display message before starting processing
+    print("Starting data processing...")
+    
+    # Copy dataset to S3 bucket
     copy_dataset_to_s3()
+    
+    # Read dataset from S3 bucket into pandas DataFrame
+    df = pd.read_csv("s3://your-bucket-name/dataset.csv")
+    
+    # Remove HTML tags and emoji from comments
+    df["comment"] = df["comment"].apply(remove_html_tags)
+    df["comment"] = df["comment"].apply(remove_emoji)
+    
+    # Rename output file
+    rename_output_file("dataset.csv")
+    
+    # Display message after finishing processing
+    print("Data processing finished.")
+    
+# Run the main function
+start_time = time.time()
+main()
+end_time = time.time()
+duration = end_time - start_time
+print(f"Total duration: {duration} seconds.")
 
-    # Calculate the total duration of the operation
-    end_time = datetime.datetime.now()
-    duration = end_time - start_time
-
-    # Display the total duration
-    print(f"Total duration: {duration}")

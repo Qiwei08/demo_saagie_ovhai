@@ -4,66 +4,52 @@
 # Display a message  before starting processing and when it's finished plus the total duration of the operation
 
 
-import time
+
 import boto3
 import pandas as pd
 from bs4 import BeautifulSoup
 import re
+import datetime
+import time
 
-# Copy dataset from Huggingface to S3 bucket
 def copy_dataset_to_s3():
-    # Code to copy dataset from Huggingface to S3 bucket goes here
-    pass
-
-# Remove HTML tags from text
-def remove_html_tags(text):
-    soup = BeautifulSoup(text, "html.parser")
-    return soup.get_text()
-
-# Remove emoji from text
-def remove_emoji(text):
-    emoji_pattern = re.compile("["
-                           u"\U0001F600-\U0001F64F"  # emoticons
-                           u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                           u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                           u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                           u"\U00002702-\U000027B0"
-                           u"\U000024C2-\U0001F251"
-                           "]+", flags=re.UNICODE)
-    return emoji_pattern.sub(r'', text)
-
-# Rename output file with timestamp and description
-def rename_output_file(filename):
-    timestamp = time.strftime("%Y%m%d%H%M%S")
-    new_filename = f"{timestamp}_extract_comment_IMDB_from_HF.csv"
-    # Code to rename the file goes here
-    pass
-
-# Main function
-def main():
     # Display message before starting processing
-    print("Starting data processing...")
-    
-    # Copy dataset to S3 bucket
-    copy_dataset_to_s3()
-    
-    # Read dataset from S3 bucket into pandas DataFrame
-    df = pd.read_csv("s3://your-bucket-name/dataset.csv")
-    
-    # Remove HTML tags and emoji from comments
-    df["comment"] = df["comment"].apply(remove_html_tags)
-    df["comment"] = df["comment"].apply(remove_emoji)
-    
-    # Rename output file
-    rename_output_file("dataset.csv")
-    
+    print("//.")
+
+    # Copy dataset from Huggingface to S3 bucket
+    s3 = boto3.client('s3')
+    s3.copy_object(
+        Bucket='your-s3-bucket',
+        CopySource='huggingface-dataset-path',
+        Key='dataset.csv'
+    )
+
+    # Read dataset from S3 bucket
+    df = pd.read_csv('s3://your-s3-bucket/dataset.csv')
+
+    # Remove HTML tags and emojis from comments
+    df['comment'] = df['comment'].apply(lambda x: BeautifulSoup(x, 'html.parser').get_text())
+    df['comment'] = df['comment'].apply(lambda x: re.sub(r'[^\x00-\x7F]+', '', x))
+
+    # Generate timestamp for renaming output file
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+    # Rename output file with timestamp
+    output_filename = f"{timestamp}_extract_comment_IMDB_from_HF.csv"
+    df.to_csv(output_filename, index=False)
+
     # Display message after finishing processing
-    print("Data processing finished.")
-    
-# Run the main function
+    print("Dataset copied and processed successfully!")
+
+# Start timer
 start_time = time.time()
-main()
+
+# Call the function to copy dataset to S3 bucket and process it
+copy_dataset_to_s3()
+
+# Calculate total duration of operation
 end_time = time.time()
 duration = end_time - start_time
-print(f"Total duration: {duration} seconds.")
 
+# Display total duration of operation
+print(f"Total duration: {duration} seconds")

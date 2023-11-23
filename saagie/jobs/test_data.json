@@ -6,7 +6,5 @@
     "technology": "Python",
     "technology_catalog": "Saagie",
     "runtime_version": "3.9",
-    "command_line": "python {file}",
-    "extra_technology": "",
-    "extra_technology_version": ""
+    "command_line": "python {file}"
 }

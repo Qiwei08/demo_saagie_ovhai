@@ -11,79 +11,25 @@ env:
   CI_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
 jobs:
-  build:
+  test_job:
     runs-on: ubuntu-latest
+    name: A job to say hello
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content
+        uses: actions/checkout@v4 # checkout the repository content
 
-      - name: setup python
-        uses: actions/setup-python@v4
+      - name: Ci with saagie tool
+        id: update
+        uses: Qiwei08/cicd_saagie_tool@v0.0.1
         with:
-          python-version: '3.10' # install the python version needed
-
-      - name: install required python librairies
-        run: |
-          python -m pip install --upgrade pip 
-          pip install -r requirements.txt
-
-      - name: Get specific changed files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v37 # check if we have file changed
-        with:
-          files_yaml: |
-            jobs:
-              - saagie/jobs/*.json
-            pipelines:
-              - code/pipelines/*.yaml
-
-      - name: Run changed-files with dir_names
-        id: changed-files-dir-names
-        uses: tj-actions/changed-files@v37
-        with:
-          dir_names: "true"
-          files_yaml: |
-            source_code:
-              - code/jobs/*/*.py
-
-      - name: Run step if any of the jobs files above change
-        if: steps.changed-files-specific.outputs.jobs_any_changed == 'true' # check if a job config file have change
-        # then it will package the job and update on Saagie
-        run: |
-          for file in ${{ steps.changed-files-specific.outputs.jobs_all_changed_files }}; do
-            echo "$file was modified"
-            file_name=$(basename ${file})
-            file_name_without_ext=${file_name%.*}
-            python __main__.py --action package_job --job_name ${file_name_without_ext} 
-            python __main__.py --action update_job --job_name ${file_name_without_ext} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
-          done
-
-      - name: Run step if any of the jobs source dir above change
-        if: steps.changed-files-dir-names.outputs.source_code_any_changed == 'true'
-        run: |
-          for file in ${{ steps.changed-files-dir-names.outputs.source_code_all_changed_files }}; do
-            echo "$file was modified"
-            dir_name=$(basename ${file})
-            echo "$dir_name"
-            python __main__.py --action package_job --job_name ${dir_name} 
-            python __main__.py --action update_job --job_name ${dir_name} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
-          done
-    
-#      - name: Run step if any of the jobs sources files above change
-#        if: steps.changed-files-specific.outputs.job_source_any_changed == 'true' # check if a job config file have change
-#        # then it will package the job and update on Saagie
-#        run: |
-#            python __main__.py --action package_job --job_name launch_GPU_training
-#            python __main__.py --action update_job --job_name launch_GPU_training --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
-
-
-      - name: Run step if any of the pipelines files above change
-        if: steps.changed-files-specific.outputs.pipelines_any_changed == 'true' # check if a pipeline config file have change
-        # then it will update on Saagie
-        run: |
-          for file in ${{ steps.changed-files-specific.outputs.pipelines_all_changed_files }}; do
-            echo "$file was modified"
-            file_name=$(basename ${file})
-            file_name_without_ext=${file_name%.*}
-            python __main__.py --action update_pipeline --pipeline_name ${file_name_without_ext} --saagie_url ${{secrets.SAAGIE_URL}} --saagie_user ${{secrets.SAAGIE_USER}} --saagie_pwd ${{secrets.SAAGIE_PWD}} --saagie_realm ${{secrets.SAAGIE_REALM}} --saagie_env dev
-          done
+          saagie_url: ${{secrets.SAAGIE_URL}}
+          saagie_user: ${{secrets.SAAGIE_USER}}
+          saagie_pwd: ${{secrets.SAAGIE_PWD}}
+          saagie_realm: ${{secrets.SAAGIE_REALM}}
+          saagie_env: 'dev'
+          job_config_folder: './saagie/jobs/*.json'
+          pipeline_config_folder: './saagie/pipelines/*.json'
+          env_config_folder: './saagie/envs/*.json'
+          job_source_folder: './code/jobs/*/*'
+          pipeline_source_folder: './code/pipelines/*.yaml'
+          artefact_code_folder: './dist/*/*'

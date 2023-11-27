@@ -6,7 +6,5 @@
     "technology": "Python",
     "technology_catalog": "Saagie",
     "runtime_version": "3.9",
-    "command_line": "python {file} --hf_model prajjwal1/bert-tiny --hf_ds sst2 --randomstate 42 --train_subset 12000 --eval_subset 600 --epochs 3 --device cuda --repo_name sentiment-model-saagie --tracking $MLFLOWSERVER_URL",
-    "extra_technology": "",
-    "extra_technology_version": ""
+    "command_line": "python {file} --hf_model prajjwal1/bert-tiny --hf_ds sst2 --randomstate 42 --train_subset 12000 --eval_subset 600 --epochs 3 --device cuda --repo_name sentiment-model-saagie --tracking $MLFLOWSERVER_URL"
 }

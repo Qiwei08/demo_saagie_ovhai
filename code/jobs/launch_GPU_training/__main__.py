@@ -221,6 +221,7 @@ if __name__ == "__main__":
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         level=logging.INFO,
                         datefmt="%d/%m/%Y %H:%M:%S")
+    print("Start ")
     main()
 
 

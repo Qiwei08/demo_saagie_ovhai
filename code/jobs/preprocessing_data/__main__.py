@@ -7,18 +7,23 @@
 
 
 import time
-import pandas as pd
-import boto3
-from datasets import load_dataset
 import re
+import pandas as pd
+from datasets import load_dataset
+import boto3
 from datetime import datetime
 
-# Function to remove HTML tags and Emojis
-def clean_text(text):
-    # Remove HTML tags using regex
-    clean_html = re.sub(r'<.*?>', '', text)
-    # Remove Emojis using regex
-    clean_text = re.sub(r'[^\w\s,]', '', clean_html)
+def remove_html_tags_and_emoji(text):
+    clean_text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
+    emoji_pattern = re.compile("["
+                           u"\U0001F600-\U0001F64F"  # emoticons
+                           u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                           u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                           u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           u"\U00002702-\U000027B0"
+                           u"\U000024C2-\U0001F251"
+                           "]+", flags=re.UNICODE)
+    clean_text = emoji_pattern.sub(r'', clean_text)  # Remove emojis
     return clean_text
 
 def main():
@@ -27,35 +32,35 @@ def main():
     start_time = time.time()
 
     # Load the dataset from Huggingface
-    dataset = load_dataset('imdb', split='train')
+    dataset = load_dataset("imdb")
 
-    # Convert the dataset to pandas dataframe
-    df = pd.DataFrame(dataset)
+    # Convert to pandas dataframe
+    df = pd.DataFrame(dataset['train'])
 
-    # Apply the cleaning function to reviews
-    df['text'] = df['text'].apply(clean_text)
+    # Remove HTML tags and emojis from the 'text' column
+    df['text'] = df['text'].apply(remove_html_tags_and_emoji)
 
     # Get current timestamp
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # Define the output filename
+    # Rename the output file
     output_filename = f"{timestamp}_extract_IMDB_comments_from_HF.csv"
 
-    # Save the cleaned data to a csv file
+    # Save the dataframe to a CSV file
     df.to_csv(output_filename, index=False)
 
-    # Upload the file to S3 bucket
+    # Upload to S3 bucket
     s3_client = boto3.client('s3')
-    bucket_name = 'your-bucket-name'  # Replace with your bucket name
-    s3_client.upload_file(output_filename, bucket_name, output_filename)
+    s3_bucket_name = 'your-s3-bucket-name'
+    s3_client.upload_file(output_filename, s3_bucket_name, output_filename)
 
     end_time = time.time()
     duration = end_time - start_time
 
-    print(f"Finished processing. The operation took {duration:.2f} seconds.")
-    print(f"Number of rows: {df.shape[0]}")
-    print(f"Number of columns: {df.shape[1]}")
-    print("First 5 rows of the output file:")
+    print(f"Dataset processing finished in {duration:.2f} seconds.")
+    print(f"Output file has {df.shape[0]} rows and {df.shape[1]} columns.")
+
+    # Display first 5 rows of the dataframe
     print(df.head())
 
 if __name__ == "__main__":

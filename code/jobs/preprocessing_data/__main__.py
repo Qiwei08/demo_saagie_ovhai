@@ -1,20 +1,29 @@
-# Write a python program to copy a dataset for the tiny-bert model from Huggingface to S3 bucket,
-# remove html balises and emoji 
-# rename the output with the following pattern "<timestamp>_extract_IMDB_comments_from_HF.csv"
-# Display a message  before starting processing and when it's finished plus the total duration of the operation
-# Display the number of rows and columns of the output file
-# Display the first 5 rows of the output file
-
-
-import time
-import re
 import pandas as pd
-from datasets import load_dataset
-import boto3
 from datetime import datetime
+import boto3
+import re
 
-def remove_html_tags_and_emoji(text):
-    clean_text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
+def copy_dataset_to_s3():
+    # Display message before starting processing
+    print("Copying dataset to S3 bucket...")
+
+    # Copy dataset for tiny-bert model from Huggingface to S3 bucket
+    # Replace <your_huggingface_dataset> with the actual dataset name
+    s3 = boto3.client('s3')
+    s3.upload_file('<your_huggingface_dataset>', '<your_s3_bucket>', '<timestamp>_extract_IMDB_comments_from_HF.csv')
+
+    # Display message when finished copying
+    print("Dataset copied successfully!")
+
+def remove_html_balises_and_emoji():
+    # Read the dataset from S3 bucket
+    # Replace <your_s3_bucket> and <timestamp>_extract_IMDB_comments_from_HF.csv with the actual values
+    df = pd.read_csv('s3://<your_s3_bucket>/<timestamp>_extract_IMDB_comments_from_HF.csv')
+
+    # Remove HTML balises using regular expressions
+    df['text'] = df['text'].apply(lambda x: re.sub('<.*?>', '', x))
+
+    # Remove emojis using regular expressions
     emoji_pattern = re.compile("["
                            u"\U0001F600-\U0001F64F"  # emoticons
                            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -23,46 +32,39 @@ def remove_html_tags_and_emoji(text):
                            u"\U00002702-\U000027B0"
                            u"\U000024C2-\U0001F251"
                            "]+", flags=re.UNICODE)
-    clean_text = emoji_pattern.sub(r'', clean_text)  # Remove emojis
-    return clean_text
+    df['text'] = df['text'].apply(lambda x: emoji_pattern.sub(r'', x))
+
+    # Save the modified dataset back to S3 bucket
+    df.to_csv('s3://<your_s3_bucket>/<timestamp>_extract_IMDB_comments_from_HF.csv', index=False)
+
+def display_file_info():
+    # Read the modified dataset from S3 bucket
+    # Replace <your_s3_bucket> and <timestamp>_extract_IMDB_comments_from_HF.csv with the actual values
+    df = pd.read_csv('s3://<your_s3_bucket>/<timestamp>_extract_IMDB_comments_from_HF.csv')
+
+    # Display number of rows and columns
+    num_rows = df.shape[0]
+    num_cols = df.shape[1]
+    print(f"Number of rows: {num_rows}")
+    print(f"Number of columns: {num_cols}")
+
+    # Display first 5 rows
+    print("First 5 rows:")
+    print(df.head(5))
 
 def main():
-    print("Starting the dataset processing...")
+    start_time = datetime.now()
 
-    start_time = time.time()
+    copy_dataset_to_s3()
+    remove_html_balises_and_emoji()
+    display_file_info()
 
-    # Load the dataset from Huggingface
-    dataset = load_dataset("imdb")
-
-    # Convert to pandas dataframe
-    df = pd.DataFrame(dataset['train'])
-
-    # Remove HTML tags and emojis from the 'text' column
-    df['text'] = df['text'].apply(remove_html_tags_and_emoji)
-
-    # Get current timestamp
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-
-    # Rename the output file
-    output_filename = f"{timestamp}_extract_IMDB_comments_from_HF.csv"
-
-    # Save the dataframe to a CSV file
-    df.to_csv(output_filename, index=False)
-
-    # Upload to S3 bucket
-    s3_client = boto3.client('s3')
-    s3_bucket_name = 'your-s3-bucket-name'
-    s3_client.upload_file(output_filename, s3_bucket_name, output_filename)
-
-    end_time = time.time()
+    end_time = datetime.now()
     duration = end_time - start_time
 
-    print(f"Dataset processing finished in {duration:.2f} seconds.")
-    print(f"Output file has {df.shape[0]} rows and {df.shape[1]} columns.")
-
-    # Display first 5 rows of the dataframe
-    print(df.head())
+    print(f"Total duration: {duration}")
 
 if __name__ == "__main__":
     main()
-    
+
+
